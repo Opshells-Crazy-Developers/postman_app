@@ -1,42 +1,50 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(PostmanApp());
+void main() {
+  runApp(MyApp());
+}
 
-class PostmanApp extends StatelessWidget {
-  const PostmanApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: PostmanUI(),
-      debugShowCheckedModeBanner: false,
+      title: 'Postman Clone',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.orange,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MainScreen(),
+        '/web': (context) => WebPage(),
+        '/workspace': (context) => WorkspacePage(),
+        '/collections': (context) => CollectionsPage(),
+        '/apis': (context) => ApisPage(),
+        '/monitor': (context) => MonitorPage(),
+        '/history': (context) => HistoryPage(),
+        '/help': (context) => HelpPage(),
+        '/settings': (context) => SettingsPage(),
+      },
     );
   }
 }
 
-class PostmanUI extends StatefulWidget {
-  const PostmanUI({super.key});
-
+class MainScreen extends StatefulWidget {
   @override
-  State<PostmanUI> createState() => _PostmanUIState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _PostmanUIState extends State<PostmanUI> {
+class _MainScreenState extends State<MainScreen> {
   String? openDrawer;
-  List<String> tabs = ['Overview']; // To store tab names
-  int selectedTabIndex = 0; // To track the selected tab
 
-// Add this method to handle adding new tabs
+  List<String> tabs = ['Overview'];
+  // To store tab names
+  int selectedTabIndex = 0;
+  // To track the selected tab
   void _addNewTab() {
     setState(() {
       tabs.add('New Request ${tabs.length + 1}');
       selectedTabIndex = tabs.length - 1; // Select the newly added tab
-    });
-  }
-
-  void _showDrawer(String drawerType) {
-    setState(() {
-      openDrawer = openDrawer == drawerType ? null : drawerType;
     });
   }
 
@@ -95,15 +103,33 @@ class _PostmanUIState extends State<PostmanUI> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        title: Text(
-          'Test examples in Postman',
-          style: TextStyle(fontSize: 16, color: Colors.white),
+        backgroundColor: Colors.grey[900],
+        title: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.grey[850],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.search, color: Colors.grey[400]),
+              SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Search',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+      drawer: MainDrawer(),
       body: Column(
         children: [
           Container(
@@ -170,231 +196,98 @@ class _PostmanUIState extends State<PostmanUI> {
             ),
           ),
           Expanded(
-            child: Stack(
+            child: Column(
               children: [
-                Row(
-                  children: [
-                    // Sidebar
-                    Container(
-                      width: 60,
-                      color: Colors.grey[900],
+                // Header
+                Container(
+                  color: Colors.grey[900],
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 8.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 8),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(),
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.grey[600],
+                            size: 18,
+                          ),
+                        ),
+                        Container(
+                          width: 120,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: List.generate(
+                                tabs.length,
+                                (index) => buildOutlinedTab(tabs[index], index),
+                              ),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(),
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.grey[600],
+                            size: 18,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed:
+                              _addNewTab, // Add this function to the + icon
+                          icon: Icon(Icons.add, color: Colors.white),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon:
+                              Icon(Icons.arrow_drop_down, color: Colors.white),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'No environment',
+                          style: TextStyle(color: Colors.grey[400]),
+                        ),
+                        Icon(Icons.expand_more, color: Colors.grey[400]),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Content Area
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 5),
-                          IconButton(
-                            icon: Icon(Icons.web,
-                                color: openDrawer == 'web'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('web'),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.crop_landscape_outlined,
-                                color: openDrawer == 'workspace'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('workspace'),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.event_note_outlined,
-                                color: openDrawer == 'collections'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('collections'),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.api_outlined,
-                                color: openDrawer == 'apis'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('apis'),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.monitor_heart,
-                                color: openDrawer == 'monitor'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('monitor'),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.history,
-                                color: openDrawer == 'history'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('history'),
-                          ),
-                          Spacer(),
-                          IconButton(
-                            icon: Icon(Icons.help_outline,
-                                color: openDrawer == 'help'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('help'),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.settings_outlined,
-                                color: openDrawer == 'settings'
-                                    ? Colors.orange
-                                    : Colors.white),
-                            onPressed: () => _showDrawer('settings'),
+                          Text(
+                            'Test examples in Postman',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                    // Main Content
-                    Expanded(
-                      child: Column(
-                        children: [
-                          // Header
-                          Container(
-                            color: Colors.grey[900],
-                            height: 50,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 8.0),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  SizedBox(width: 8),
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(),
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.arrow_back_ios,
-                                      color: Colors.grey[600],
-                                      size: 18,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 120,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: List.generate(
-                                          tabs.length,
-                                          (index) => buildOutlinedTab(
-                                              tabs[index], index),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(),
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Colors.grey[600],
-                                      size: 18,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed:
-                                        _addNewTab, // Add this function to the + icon
-                                    icon: Icon(Icons.add, color: Colors.white),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.arrow_drop_down,
-                                        color: Colors.white),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'No environment',
-                                    style: TextStyle(color: Colors.grey[400]),
-                                  ),
-                                  Icon(Icons.expand_more,
-                                      color: Colors.grey[400]),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          // Content Area
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Test examples in Postman',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      'This public workspace contains collections and test examples.',
-                                      style: TextStyle(color: Colors.grey[400]),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                // Overlay Drawer
-                if (openDrawer != null)
-                  Positioned(
-                    left: 60,
-                    top: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[850],
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 5,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Drawer Header
-                          Container(
-                            padding: EdgeInsets.all(16),
-                            color: Colors.grey[900],
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  _getDrawerTitle(openDrawer!),
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.close, color: Colors.white),
-                                  onPressed: () =>
-                                      setState(() => openDrawer = null),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Drawer Content
-                          Expanded(
-                            child: _buildDrawerContent(openDrawer!),
+                          Text(
+                            'This public workspace contains collections and test examples.',
+                            style: TextStyle(color: Colors.grey[400]),
                           ),
                         ],
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
@@ -402,71 +295,261 @@ class _PostmanUIState extends State<PostmanUI> {
       ),
     );
   }
+}
 
-  String _getDrawerTitle(String drawerType) {
-    switch (drawerType) {
-      case 'web':
-        return 'Web';
-      case 'workspace':
-        return 'Workspace';
-      case 'collections':
-        return 'Collections';
-      case 'apis':
-        return 'APIs';
-      case 'monitor':
-        return 'Monitors';
-      case 'help':
-        return 'Help';
-      case 'settings':
-        return 'Settings';
-      case 'history':
-        return 'History';
-      default:
-        return 'Information';
-    }
+class MainDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Container(
+        color: Colors.grey[900],
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.2),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(Icons.api, size: 40, color: Colors.orange),
+                  SizedBox(height: 8),
+                  Text(
+                    'Postman Clone',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            DrawerListTile(
+              icon: Icons.web,
+              title: 'Web',
+              onTap: () => Navigator.pushNamed(context, '/web'),
+            ),
+            DrawerListTile(
+              icon: Icons.crop_landscape_outlined,
+              title: 'Workspace',
+              onTap: () => Navigator.pushNamed(context, '/workspace'),
+            ),
+            DrawerListTile(
+              icon: Icons.event_note_outlined,
+              title: 'Collections',
+              onTap: () => Navigator.pushNamed(context, '/collections'),
+            ),
+            DrawerListTile(
+              icon: Icons.api_outlined,
+              title: 'APIs',
+              onTap: () => Navigator.pushNamed(context, '/apis'),
+            ),
+            DrawerListTile(
+              icon: Icons.monitor_heart,
+              title: 'Monitor',
+              onTap: () => Navigator.pushNamed(context, '/monitor'),
+            ),
+            DrawerListTile(
+              icon: Icons.history,
+              title: 'History',
+              onTap: () => Navigator.pushNamed(context, '/history'),
+            ),
+            Divider(color: Colors.grey[800]),
+            DrawerListTile(
+              icon: Icons.help_outline,
+              title: 'Help',
+              onTap: () => Navigator.pushNamed(context, '/help'),
+            ),
+            DrawerListTile(
+              icon: Icons.settings_outlined,
+              title: 'Settings',
+              onTap: () => Navigator.pushNamed(context, '/settings'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
+}
 
-  Widget _buildDrawerContent(String drawerType) {
-    switch (drawerType) {
-      case 'collections':
-        return ListView(
-          children: [
-            ListTile(
-              leading: Icon(Icons.folder, color: Colors.white),
-              title: Text('My Collection 1',
-                  style: TextStyle(color: Colors.white)),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.folder, color: Colors.white),
-              title: Text('My Collection 2',
-                  style: TextStyle(color: Colors.white)),
-              onTap: () {},
-            ),
-          ],
-        );
-      case 'apis':
-        return ListView(
-          children: [
-            ListTile(
-              leading: Icon(Icons.api, color: Colors.white),
-              title: Text('API 1', style: TextStyle(color: Colors.white)),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.api, color: Colors.white),
-              title: Text('API 2', style: TextStyle(color: Colors.white)),
-              onTap: () {},
-            ),
-          ],
-        );
-      default:
-        return Center(
-          child: Text(
-            'Content for ${_getDrawerTitle(drawerType)}',
-            style: TextStyle(color: Colors.white),
-          ),
-        );
-    }
+class DrawerListTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const DrawerListTile({
+    Key? key,
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.white),
+      title: Text(title, style: TextStyle(color: Colors.white)),
+      onTap: onTap,
+      hoverColor: Colors.orange.withOpacity(0.1),
+    );
+  }
+}
+
+// Separate pages
+class WebPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Web'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child:
+              Text('Web Page Content', style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
+class WorkspacePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Workspace'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child:
+              Text('Workspace Content', style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
+class CollectionsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Collections'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child: Text('Collections Content',
+              style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
+class ApisPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('APIs'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child: Text('APIs Content', style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
+class MonitorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Monitor'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child: Text('Monitor Content', style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
+class HistoryPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('History'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child: Text('History Content', style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
+class HelpPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Help'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child: Text('Help Content', style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Settings'),
+        backgroundColor: Colors.grey[900],
+      ),
+      drawer: MainDrawer(),
+      body: Container(
+        color: Colors.grey[850],
+        child: Center(
+          child:
+              Text('Settings Content', style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
   }
 }
