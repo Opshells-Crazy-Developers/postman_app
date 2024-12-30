@@ -10,13 +10,13 @@ class WorkspaceEnvironment extends StatelessWidget {
   final List<String> environments;
 
   const WorkspaceEnvironment({
-    Key? key,
+    super.key,
     this.selectedWorkspace,
     this.selectedEnvironment,
     required this.onWorkspaceChanged,
     required this.onEnvironmentChanged,
     required this.environments,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

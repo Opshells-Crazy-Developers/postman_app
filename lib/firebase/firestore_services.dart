@@ -1,6 +1,9 @@
 // lib/firebase/firestore_services.dart
 
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -35,8 +38,10 @@ class FirestoreService {
       int lastId = querySnapshot.docs.first['id'] as int;
       return lastId + 1;
     } catch (e) {
-      print('Error getting next workspace ID: $e');
-      throw e;
+      if (kDebugMode) {
+        print('Error getting next workspace ID: $e');
+      }
+      rethrow;
     }
   }
 
@@ -53,8 +58,10 @@ class FirestoreService {
         'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print('Error adding workspace: $e');
-      throw e;
+      if (kDebugMode) {
+        print('Error adding workspace: $e');
+      }
+      rethrow;
     }
   }
 
@@ -71,7 +78,7 @@ class FirestoreService {
       }
     } catch (e) {
       print('Error deleting workspace: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -102,7 +109,7 @@ class FirestoreService {
       return lastId + 1;
     } catch (e) {
       print('Error getting next environment ID: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -117,7 +124,7 @@ class FirestoreService {
       });
     } catch (e) {
       print('Error adding environment: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -132,8 +139,10 @@ class FirestoreService {
         await doc.reference.delete();
       }
     } catch (e) {
-      print('Error deleting environment: $e');
-      throw e;
+      if (kDebugMode) {
+        print('Error deleting environment: $e');
+      }
+      rethrow;
     }
   }
 }

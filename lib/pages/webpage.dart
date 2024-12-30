@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:postman_app/components/main_drawer.dart';
 
 class WebPage extends StatelessWidget {
+  const WebPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
