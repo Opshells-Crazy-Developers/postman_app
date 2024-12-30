@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "848251132499",
+    "project_id": "postman-app-6e7fd",
+    "storage_bucket": "postman-app-6e7fd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:848251132499:android:faa2eaa01b33e1ab3d44a6",
+        "android_client_info": {
+          "package_name": "com.example.postman_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAup4ZG5EH3mI39StTIZaxbhn1zjV8930c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
