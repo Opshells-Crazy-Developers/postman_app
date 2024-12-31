@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:postman_app/new.dart';
+import 'package:postman_app/components/app_state.dart';
 import 'package:postman_app/pages/ApisPage.dart';
 import 'package:postman_app/pages/HelpPage.dart';
 import 'package:postman_app/pages/Historypage.dart';
@@ -14,7 +14,7 @@ import 'pages/settingPage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(AppStateContainer(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
