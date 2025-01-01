@@ -7,6 +7,7 @@ import 'package:postman_app/pages/Historypage.dart';
 import 'package:postman_app/pages/MonitorPage.dart';
 import 'package:postman_app/pages/mainscreen.dart';
 import 'package:postman_app/pages/webpage.dart';
+import 'package:postman_app/pages/workflow.dart';
 import 'package:postman_app/pages/workspacePage.dart';
 import 'pages/CollectionsPage.dart';
 import 'pages/settingPage.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => MainScreen(),
         '/web': (context) => WebPage(),
+        '/workflow': (context) => Workflow(),
         '/workspace': (context) => WorkspacePage(),
         '/collections': (context) => CollectionsPage(),
         '/apis': (context) => ApisPage(),

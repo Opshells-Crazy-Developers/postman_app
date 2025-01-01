@@ -68,6 +68,11 @@ class MainDrawer extends StatelessWidget {
               onTap: () => Navigator.pushNamed(context, '/collections'),
             ),
             DrawerListTile(
+              icon: Icons.account_tree_rounded,
+              title: 'Workflow',
+              onTap: () => Navigator.pushNamed(context, '/workflow'),
+            ),
+            DrawerListTile(
               icon: Icons.api_outlined,
               title: 'APIs (VPN Networks)',
               onTap: () => Navigator.pushNamed(context, '/apis'),
@@ -99,6 +104,7 @@ class MainDrawer extends StatelessWidget {
     );
   }
 }
+
 class DrawerListTile extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -122,4 +128,3 @@ class DrawerListTile extends StatelessWidget {
     );
   }
 }
-
