@@ -41,34 +41,37 @@ class Overview extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildQuickActionButton(
-                          context,
-                          'New Request',
-                          Icons.add,
-                          () {
-                            // Handle new request action
-                          },
-                        ),
-                        _buildQuickActionButton(
-                          context,
-                          'Import',
-                          Icons.file_upload,
-                          () {
-                            // Handle import action
-                          },
-                        ),
-                        _buildQuickActionButton(
-                          context,
-                          'New Collection',
-                          Icons.create_new_folder,
-                          () {
-                            // Handle new collection action
-                          },
-                        ),
-                      ],
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildQuickActionButton(
+                            context,
+                            'New Request',
+                            Icons.add,
+                            () {
+                              // Handle new request action
+                            },
+                          ),
+                          _buildQuickActionButton(
+                            context,
+                            'Import',
+                            Icons.file_upload,
+                            () {
+                              // Handle import action
+                            },
+                          ),
+                          _buildQuickActionButton(
+                            context,
+                            'New Collection',
+                            Icons.create_new_folder,
+                            () {
+                              // Handle new collection action
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

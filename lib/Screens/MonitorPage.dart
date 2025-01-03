@@ -1,23 +1,24 @@
+
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:postman_app/components/main_drawer.dart';
+import 'package:postman_app/widgets/main_drawer.dart';
 
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({super.key});
+class MonitorPage extends StatelessWidget {
+  const MonitorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('History'),
+        title: Text('Monitor'),
         backgroundColor: Colors.grey[900],
       ),
       drawer: MainDrawer(),
       body: Container(
         color: Colors.grey[850],
         child: Center(
-          child: Text('History Content', style: TextStyle(color: Colors.white)),
+          child: Text('Monitor Content', style: TextStyle(color: Colors.white)),
         ),
       ),
     );

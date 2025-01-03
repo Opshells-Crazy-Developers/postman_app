@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:postman_app/components/main_drawer.dart';
+import 'package:postman_app/widgets/main_drawer.dart';
 
 class WebPage extends StatelessWidget {
   const WebPage({super.key});

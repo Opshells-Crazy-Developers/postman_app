@@ -1,16 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:postman_app/components/app_state.dart';
-import 'package:postman_app/pages/ApisPage.dart';
-import 'package:postman_app/pages/HelpPage.dart';
-import 'package:postman_app/pages/Historypage.dart';
-import 'package:postman_app/pages/MonitorPage.dart';
-import 'package:postman_app/pages/mainscreen.dart';
-import 'package:postman_app/pages/webpage.dart';
-import 'package:postman_app/pages/workflow.dart';
-import 'package:postman_app/pages/workspacePage.dart';
-import 'pages/CollectionsPage.dart';
-import 'pages/settingPage.dart';
+import 'package:postman_app/Screens/ApisPage.dart';
+import 'package:postman_app/Screens/HelpPage.dart';
+import 'package:postman_app/Screens/Historypage.dart';
+import 'package:postman_app/Screens/MonitorPage.dart';
+import 'package:postman_app/Screens/mainscreen.dart';
+import 'package:postman_app/Screens/webpage.dart';
+import 'package:postman_app/Screens/workspacePage.dart';
+import 'package:postman_app/Screens/workflow.dart';
+import 'Screens/CollectionsPage.dart';
+import 'Screens/settingPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => MainScreen(),
         '/web': (context) => WebPage(),
-        '/workflow': (context) => Workflow(),
+        '/workflow': (context) => CanvasScreen(),
         '/workspace': (context) => WorkspacePage(),
         '/collections': (context) => CollectionsPage(),
         '/apis': (context) => ApisPage(),

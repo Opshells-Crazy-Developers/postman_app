@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:postman_app/components/app_state.dart';
-import 'package:postman_app/components/search_bar.dart';
-import 'package:postman_app/components/main_drawer.dart';
-import 'package:postman_app/components/tab_bar.dart';
+import 'package:postman_app/widgets/main_drawer.dart';
 import 'package:postman_app/components/workspace_environment.dart';
 // import 'package:postman_app/new.dart';
-import 'package:postman_app/overview.dart';
+import 'package:postman_app/components/overview.dart';
+import 'package:postman_app/widgets/search_bar.dart';
+import 'package:postman_app/widgets/tab_bar.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
