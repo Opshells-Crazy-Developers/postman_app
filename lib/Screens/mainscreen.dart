@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:postman_app/components/app_state.dart';
+import 'package:postman_app/widgets/app_state.dart';
 import 'package:postman_app/widgets/main_drawer.dart';
-import 'package:postman_app/components/workspace_environment.dart';
-// import 'package:postman_app/new.dart';
-import 'package:postman_app/components/overview.dart';
+import 'package:postman_app/components/Environment_Workspace/workspace_environment.dart';
+import 'package:postman_app/components/MainScreen_components/overview.dart';
 import 'package:postman_app/widgets/search_bar.dart';
 import 'package:postman_app/widgets/tab_bar.dart';
 
@@ -24,14 +23,6 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> tabPages = [
     Overview(), // Assuming you have an Overview widget
   ];
-
-  // void _addNewTab() {
-  //   setState(() {
-  //     tabs.add('New Request ${tabs.length + 1}');
-  //     tabPages.add(NewFile()); // Add new request page
-  //     selectedTabIndex = tabs.length - 1;
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -57,19 +48,22 @@ class _MainScreenState extends State<MainScreen> {
                 color: Colors.grey[900],
                 padding: EdgeInsets.symmetric(
                   horizontal: screenSize.width * 0.03,
-                  // vertical: screenSize.height * 0.001,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    WorkspaceEnvironment(
-                      selectedWorkspace: selectedWorkspace,
-                      selectedEnvironment: selectedEnvironment,
-                      environments: environments,
-                      onWorkspaceChanged: (newValue) =>
-                          setState(() => selectedWorkspace = newValue),
-                      onEnvironmentChanged: (newValue) =>
-                          setState(() => selectedEnvironment = newValue),
+                    SizedBox(
+                      height:
+                          screenSize.height * 0.05, // Adjust height as needed
+                      child: WorkspaceEnvironment(
+                        selectedWorkspace: selectedWorkspace,
+                        selectedEnvironment: selectedEnvironment,
+                        environments: environments,
+                        onWorkspaceChanged: (newValue) =>
+                            setState(() => selectedWorkspace = newValue),
+                        onEnvironmentChanged: (newValue) =>
+                            setState(() => selectedEnvironment = newValue),
+                      ),
                     ),
                     SizedBox(height: screenSize.height * 0.01),
                     TabBarComponent(
@@ -82,6 +76,7 @@ class _MainScreenState extends State<MainScreen> {
                   ],
                 ),
               ),
+
               // Tab Content
               Expanded(
                 child: Padding(

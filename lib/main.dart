@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:postman_app/components/app_state.dart';
+import 'package:postman_app/widgets/app_state.dart';
 import 'package:postman_app/Screens/ApisPage.dart';
 import 'package:postman_app/Screens/HelpPage.dart';
 import 'package:postman_app/Screens/Historypage.dart';

@@ -4,6 +4,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:postman_app/components/MainScreen_components/body.dart';
+import 'package:postman_app/components/MainScreen_components/header.dart';
+import 'package:postman_app/components/MainScreen_components/params.dart';
 
 class NewFile extends StatefulWidget {
   const NewFile({super.key});
@@ -38,11 +41,11 @@ class _NewFileState extends State<NewFile> {
 
     try {
       final url = Uri.parse(urlController.text);
-final headers = {
+      final headers = {
         'Content-Type': 'application/json',
         ...getAuthorizationHeader(),
-      };    
-        http.Response response;
+      };
+      http.Response response;
 
       switch (selectedMethod) {
         case 'GET':
@@ -98,10 +101,10 @@ final headers = {
   Map<String, String> getAuthorizationHeader() {
     switch (selectedAuthType) {
       case 'Basic Auth':
-        if (usernameController.text.isNotEmpty || passwordController.text.isNotEmpty) {
-          final credentials = base64Encode(
-            utf8.encode('${usernameController.text}:${passwordController.text}')
-          );
+        if (usernameController.text.isNotEmpty ||
+            passwordController.text.isNotEmpty) {
+          final credentials = base64Encode(utf8
+              .encode('${usernameController.text}:${passwordController.text}'));
           return {'Authorization': 'Basic $credentials'};
         }
         break;
@@ -131,7 +134,8 @@ final headers = {
   String? validateAuthInputs() {
     switch (selectedAuthType) {
       case 'Basic Auth':
-        if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+        if (usernameController.text.isEmpty ||
+            passwordController.text.isEmpty) {
           return 'Username and password are required for Basic Auth';
         }
         break;
@@ -147,7 +151,6 @@ final headers = {
     }
     return null;
   }
-
 
   Color getMethodColor(String method) {
     switch (method) {
@@ -284,7 +287,6 @@ final headers = {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -384,25 +386,9 @@ final headers = {
                           child: TabBarView(
                             children: [
                               // Params Section
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Center(
-                                  child: Text(
-                                    "Params Section (Coming Soon)",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
+                              Params(),
                               // Headers Section
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Center(
-                                  child: Text(
-                                    "Headers Section (Coming Soon)",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
+                              header(),
                               //Authorization
                               Padding(
                                 padding: EdgeInsets.all(8.0),
@@ -452,25 +438,8 @@ final headers = {
                                   ],
                                 ),
                               ),
-
-                              // Body Section
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: TextField(
-                                  controller: bodyController,
-                                  maxLines: null,
-                                  decoration: InputDecoration(
-                                    hintText: 'Request Body (JSON)',
-                                    filled: true,
-                                    fillColor: Colors.grey[800],
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                  ),
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
+                              // bodycontainer
+                              bodyContainer(),
                             ],
                           ),
                         ),
@@ -561,24 +530,24 @@ final headers = {
         },
       ),
       floatingActionButton: FloatingActionButton(
-      onPressed: () {
-        final validationError = validateAuthInputs();
-        if (validationError != null && selectedAuthType != 'No Auth') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(validationError),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
-        sendRequest();
-      },
-      backgroundColor: getMethodColor(selectedMethod),
-      child: isLoading 
-          ? CircularProgressIndicator(color: Colors.white)
-          : Icon(Icons.send),
-    ),
+        onPressed: () {
+          final validationError = validateAuthInputs();
+          if (validationError != null && selectedAuthType != 'No Auth') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(validationError),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+          sendRequest();
+        },
+        backgroundColor: getMethodColor(selectedMethod),
+        child: isLoading
+            ? CircularProgressIndicator(color: Colors.white)
+            : Icon(Icons.send),
+      ),
     );
   }
 

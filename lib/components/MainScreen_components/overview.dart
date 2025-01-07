@@ -25,55 +25,57 @@ class Overview extends StatelessWidget {
             SizedBox(height: 20),
 
             // Quick Actions Card
-            Card(
-              color: Colors.grey[800],
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Quick Actions',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                color: Colors.grey[800],
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Quick Actions',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 16),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildQuickActionButton(
-                            context,
-                            'New Request',
-                            Icons.add,
-                            () {
-                              // Handle new request action
-                            },
-                          ),
-                          _buildQuickActionButton(
-                            context,
-                            'Import',
-                            Icons.file_upload,
-                            () {
-                              // Handle import action
-                            },
-                          ),
-                          _buildQuickActionButton(
-                            context,
-                            'New Collection',
-                            Icons.create_new_folder,
-                            () {
-                              // Handle new collection action
-                            },
-                          ),
-                        ],
+                      SizedBox(height: 16),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildQuickActionButton(
+                              context,
+                              'New Request',
+                              Icons.add,
+                              () {
+                                // Handle new request action
+                              },
+                            ),
+                            _buildQuickActionButton(
+                              context,
+                              'Import',
+                              Icons.file_upload,
+                              () {
+                                // Handle import action
+                              },
+                            ),
+                            _buildQuickActionButton(
+                              context,
+                              'New Collection',
+                              Icons.create_new_folder,
+                              () {
+                                // Handle new collection action
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

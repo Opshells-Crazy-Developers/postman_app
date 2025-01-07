@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:postman_app/components/failureContainer.dart';
 import 'package:postman_app/components/sendRequest_widgetContainer.dart';
@@ -10,6 +8,7 @@ class CanvasScreen extends StatefulWidget {
   const CanvasScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CanvasScreenState createState() => _CanvasScreenState();
 }
 
@@ -17,23 +16,178 @@ class _CanvasScreenState extends State<CanvasScreen> {
   late TransformationController _transformationController;
   double _scale = 1.0;
   Offset _offset = Offset.zero;
-  bool showGrid = false; // Add this variable to control grid visibility
+  List<Map<String, dynamic>> dynamicWidgets =
+      []; // Track widgets with unique IDs
+  int containerCount = 0;
 
-  Offset startWidgetPosition = Offset(300, 300);
-  Offset sendRequestPosition = Offset(100, 100);
-  Offset successPosition = const Offset(600, 100);
-  Offset failurePosition = const Offset(600, 300);
+  Map<int, bool> selectedWidgets = {};
+  List<Connection> connections = [];
 
   @override
   void initState() {
     super.initState();
     _transformationController = TransformationController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _transformationController.value = Matrix4.identity()
+        ..translate(-500.0, -500.0);
+    });
   }
 
   @override
   void dispose() {
     _transformationController.dispose();
     super.dispose();
+  }
+
+  void _addNewStartContainer() {
+    setState(() {
+      containerCount++;
+      final center = _transformationController.toScene(Offset(
+          MediaQuery.of(context).size.width / 2,
+          MediaQuery.of(context).size.height / 2));
+      dynamicWidgets.add({
+        'id': containerCount,
+        'type': 'start',
+        'position': center,
+      });
+    });
+  }
+
+  void _addNewSendRequestContainer() {
+    setState(() {
+      containerCount++;
+      final center = _transformationController.toScene(Offset(
+          MediaQuery.of(context).size.width / 2,
+          MediaQuery.of(context).size.height / 2));
+      dynamicWidgets.add({
+        'id': containerCount,
+        'type': 'sendRequest',
+        'position': center,
+      });
+    });
+  }
+
+  void _addNewSuccessContainer() {
+    setState(() {
+      containerCount++;
+      final center = _transformationController.toScene(Offset(
+          MediaQuery.of(context).size.width / 2,
+          MediaQuery.of(context).size.height / 2));
+      dynamicWidgets.add({
+        'id': containerCount,
+        'type': 'success',
+        'position': center,
+      });
+    });
+  }
+
+  void _addNewFailureContainer() {
+    setState(() {
+      containerCount++;
+      final center = _transformationController.toScene(Offset(
+          MediaQuery.of(context).size.width / 2,
+          MediaQuery.of(context).size.height / 2));
+      dynamicWidgets.add({
+        'id': containerCount,
+        'type': 'failure',
+        'position': center,
+      });
+    });
+  }
+
+  void _deleteWidget(int id) {
+    setState(() {
+      dynamicWidgets.removeWhere((widget) => widget['id'] == id);
+      connections.removeWhere(
+        (conn) => conn.startId == id || conn.endId == id,
+      );
+      selectedWidgets.remove(id);
+    });
+  }
+
+  void _showAddOptions() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Component'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.play_circle_outline),
+                title: const Text('Add Start Container'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _addNewStartContainer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.send),
+                title: const Text('Add Send Request'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _addNewSendRequestContainer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.check_circle_outline),
+                title: const Text('Add Success Container'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _addNewSuccessContainer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.cancel_outlined),
+                title: const Text('Add Failure Container'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _addNewFailureContainer();
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleWidgetSelection(int id) {
+    setState(() {
+      if (selectedWidgets.length < 2) {
+        selectedWidgets[id] = true;
+
+        if (selectedWidgets.length == 2) {
+          // Create connection between selected widgets
+          var firstWidget = dynamicWidgets
+              .firstWhere((w) => w['id'] == selectedWidgets.keys.first);
+          var secondWidget = dynamicWidgets
+              .firstWhere((w) => w['id'] == selectedWidgets.keys.last);
+
+          connections.add(Connection(
+            startId: selectedWidgets.keys.first,
+            endId: selectedWidgets.keys.last,
+            startPoint: firstWidget['position'],
+            endPoint: secondWidget['position'],
+          ));
+
+          // Clear selection after creating connection
+          selectedWidgets.clear();
+        }
+      } else {
+        selectedWidgets.clear();
+      }
+    });
   }
 
   @override
@@ -44,38 +198,24 @@ class _CanvasScreenState extends State<CanvasScreen> {
         elevation: 1,
         title: const Text(
           'Workflow',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ElevatedButton.icon(
-              onPressed: () {
-                // Add export functionality here
-              },
-              icon: const Icon(
-                Icons.file_download_outlined,
-                color: Colors.white,
-                size: 20,
-              ),
-              label: const Text(
-                'Export',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
+              onPressed: () {},
+              icon: const Icon(Icons.file_download_outlined,
+                  color: Colors.white, size: 20),
+              label: const Text('Export',
+                  style: TextStyle(color: Colors.white, fontSize: 16)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[700],
                 elevation: 0,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                    borderRadius: BorderRadius.circular(8)),
               ),
             ),
           ),
@@ -101,116 +241,83 @@ class _CanvasScreenState extends State<CanvasScreen> {
           minScale: 0.1,
           maxScale: 10.0,
           child: SizedBox(
-            width: 50000, // Large width to allow for more space
+            width: 50000,
             height: 50000,
-            child: Stack(
-              children: [
-                CustomPaint(
-                  painter: ArrowPainter(
-                    startPoint: startWidgetPosition +
-                        const Offset(75,
-                            35), // Adjust these offsets based on your widget sizes
-                    endPoint: sendRequestPosition + const Offset(150, 100),
-                  ),
-                  child: Container(),
-                ),
-                CustomPaint(
-                  painter: ArrowPainter(
-                    startPoint: sendRequestPosition + const Offset(300, 140),
-                    endPoint: successPosition + const Offset(0, 100),
-                  ),
-                ),
-                CustomPaint(
-                  painter: ArrowPainter(
-                    startPoint: sendRequestPosition + const Offset(300, 170),
-                    endPoint: failurePosition + const Offset(0, 100),
-                  ),
-                ),
-                DraggableWidget(
-                  initialX: sendRequestPosition.dx,
-                  initialY: sendRequestPosition.dy,
-                  type: 'sendRequest',
-                  onDrag: (Offset position) {
-                    setState(() {
-                      sendRequestPosition = position;
-                    });
-                  },
-                ),
-                DraggableWidget(
-                  initialX: startWidgetPosition.dx,
-                  initialY: startWidgetPosition.dy,
-                  type: 'start',
-                  onDrag: (Offset position) {
-                    setState(() {
-                      startWidgetPosition = position;
-                    });
-                  },
-                ),
-                DraggableWidget(
-                  initialX: successPosition.dx,
-                  initialY: successPosition.dy,
-                  type: 'success',
-                  onDrag: (Offset position) {
-                    setState(() {
-                      successPosition = position;
-                    });
-                  },
-                ),
-
-                // Failure path
-                DraggableWidget(
-                  initialX: failurePosition.dx,
-                  initialY: failurePosition.dy,
-                  type: 'failure',
-                  onDrag: (Offset position) {
-                    setState(() {
-                      failurePosition = position;
-                    });
-                  },
-                ),
-              ],
+            child: Center(
+              child: Stack(
+                children: [
+                  ...dynamicWidgets.map((widget) {
+                    return DraggableWidget(
+                      key: ValueKey(widget['id']),
+                      id: widget['id'],
+                      initialX: widget['position'].dx,
+                      initialY: widget['position'].dy,
+                      type: widget['type'],
+                      isSelected: selectedWidgets.containsKey(widget['id']),
+                      onSelect: _handleWidgetSelection,
+                      onDrag: (Offset position) {
+                        setState(() {
+                          widget['position'] = position;
+                          // Update connections
+                          connections = connections.map((conn) {
+                            if (conn.startId == widget['id']) {
+                              return Connection(
+                                startId: conn.startId,
+                                endId: conn.endId,
+                                startPoint: position,
+                                endPoint: conn.endPoint,
+                              );
+                            } else if (conn.endId == widget['id']) {
+                              return Connection(
+                                startId: conn.startId,
+                                endId: conn.endId,
+                                startPoint: conn.startPoint,
+                                endPoint: position,
+                              );
+                            }
+                            return conn;
+                          }).toList();
+                        });
+                      },
+                      onDelete: () => _deleteWidget(widget['id']),
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue[700],
+        elevation: 4,
+        onPressed: _showAddOptions,
+        child: const Icon(Icons.add, color: Colors.white, size: 24),
       ),
     );
   }
 }
 
-class GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey
-      ..strokeWidth = 0.5;
-
-    const double step = 20.0;
-
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
 class DraggableWidget extends StatefulWidget {
   final double initialX;
   final double initialY;
-  final String type; // To differentiate between SendRequest and Start
+  final String type;
   final Function(Offset) onDrag;
+  final VoidCallback onDelete;
+  final int id;
+  final bool isSelected;
+  final Function(int) onSelect;
 
   const DraggableWidget({
     super.key,
-    this.initialX = 0,
-    this.initialY = 0,
+    required this.initialX,
+    required this.initialY,
     required this.type,
     required this.onDrag,
+    required this.onDelete,
+    required this.id,
+    required this.isSelected,
+    required this.onSelect,
   });
 
   @override
@@ -228,22 +335,6 @@ class _DraggableWidgetState extends State<DraggableWidget> {
     yPosition = widget.initialY;
   }
 
-  Widget _buildSendRequestContainer() {
-    return SendrequestWidgetcontainer();
-  }
-
-  Widget _buildStartContainer() {
-    return StartWidgetcontainer();
-  }
-
-  Widget _buildSuccessContainer() {
-    return SuccessResponseWidget();
-  }
-
-  Widget _buildFailureContainer() {
-    return FailureResponseWidget();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -257,115 +348,67 @@ class _DraggableWidgetState extends State<DraggableWidget> {
             widget.onDrag(Offset(xPosition, yPosition));
           });
         },
+        onLongPress: () {
+          _showDeleteDialog();
+        },
         child: _buildContainer(),
       ),
+    );
+  }
+
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Widget'),
+          content: const Text('Are you sure you want to delete this widget?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                widget.onDelete();
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildContainer() {
     switch (widget.type) {
       case 'sendRequest':
-        return _buildSendRequestContainer();
+        return SendrequestWidgetcontainer();
       case 'start':
-        return _buildStartContainer();
+        return StartWidgetcontainer();
       case 'success':
-        return _buildSuccessContainer();
+        return SuccessResponseWidget();
       case 'failure':
-        return _buildFailureContainer();
+        return FailureResponseWidget();
       default:
-        return _buildStartContainer();
+        return StartWidgetcontainer();
     }
   }
 }
 
-class ArrowPainter extends CustomPainter {
+class Connection {
+  final int startId;
+  final int endId;
   final Offset startPoint;
   final Offset endPoint;
 
-  ArrowPainter({
+  Connection({
+    required this.startId,
+    required this.endId,
     required this.startPoint,
     required this.endPoint,
   });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    // Calculate control points for the curved line
-    final controlPoint1 = Offset(
-      startPoint.dx + (endPoint.dx - startPoint.dx) * 0.5,
-      startPoint.dy,
-    );
-    final controlPoint2 = Offset(
-      startPoint.dx + (endPoint.dx - startPoint.dx) * 0.5,
-      endPoint.dy,
-    );
-
-    // Create path for curved line
-    final path = Path()
-      ..moveTo(startPoint.dx, startPoint.dy)
-      ..cubicTo(
-        controlPoint1.dx,
-        controlPoint1.dy,
-        controlPoint2.dx,
-        controlPoint2.dy,
-        endPoint.dx,
-        endPoint.dy,
-      );
-
-    // Draw the curved path
-    canvas.drawPath(path, paint);
-
-    // Calculate the middle point on the curve for the arrow
-    final middlePoint = Offset(
-      (controlPoint1.dx + controlPoint2.dx) / 2,
-      (controlPoint1.dy + controlPoint2.dy) / 2,
-    );
-
-    // Draw arrow at the middle point
-    drawArrowHead(canvas, middlePoint, startPoint);
-  }
-
-  void drawArrowHead(Canvas canvas, Offset tip, Offset start) {
-    final paint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.fill;
-
-    final double arrowSize = 10; // Size of the arrow head
-
-    // Calculate the angle for the arrow
-    double angle;
-    if (tip.dy > start.dy) {
-      angle = atan2(1, 0); // Point downward if going down
-    } else if (tip.dy < start.dy) {
-      angle = atan2(-1, 0); // Point upward if going up
-    } else {
-      angle = atan2(0, 1); // Point right if horizontal
-    }
-
-    final path = Path();
-
-    // Create a wider arrow head
-    path.moveTo(
-      tip.dx - arrowSize * cos(angle - pi / 3),
-      tip.dy - arrowSize * sin(angle - pi / 3),
-    );
-    path.lineTo(
-      tip.dx + (arrowSize * 0.5) * cos(angle),
-      tip.dy + (arrowSize * 0.5) * sin(angle),
-    );
-    path.lineTo(
-      tip.dx - arrowSize * cos(angle + pi / 3),
-      tip.dy - arrowSize * sin(angle + pi / 3),
-    );
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

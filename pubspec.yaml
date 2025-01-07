@@ -35,6 +35,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.2
+  path_provider: ^2.1.5
   provider: ^6.1.2
 
 dev_dependencies:

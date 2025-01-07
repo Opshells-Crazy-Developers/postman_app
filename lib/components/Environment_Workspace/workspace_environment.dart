@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:postman_app/components/environment_dropdown.dart';
-import 'package:postman_app/components/workspace_dropdown.dart';
+import 'package:postman_app/components/Environment_Workspace/environment_dropdown.dart';
+import 'package:postman_app/components/Environment_Workspace/workspace_dropdown.dart';
 
 class WorkspaceEnvironment extends StatelessWidget {
   final String? selectedWorkspace;
@@ -20,21 +20,22 @@ class WorkspaceEnvironment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        WorkspaceDropdown(
-          selectedWorkspace: selectedWorkspace,
-          onWorkspaceChanged: onWorkspaceChanged,
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: EnvironmentDropdown(
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          WorkspaceDropdown(
+            selectedWorkspace: selectedWorkspace,
+            onWorkspaceChanged: onWorkspaceChanged,
+          ),
+          SizedBox(width: 8),
+          EnvironmentDropdown(
             selectedEnvironment: selectedEnvironment,
             environments: environments,
             onEnvironmentChanged: onEnvironmentChanged,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

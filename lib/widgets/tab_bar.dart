@@ -126,14 +126,7 @@ class _TabBarComponentState extends State<TabBarComponent> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              onPressed: _canScrollLeft ? _scrollLeft : null,
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: _canScrollLeft ? Colors.grey[400] : Colors.grey[800],
-                size: 18,
-              ),
-            ),
+            
             Expanded(
               child: SingleChildScrollView(
                 controller: _scrollController,
@@ -146,14 +139,7 @@ class _TabBarComponentState extends State<TabBarComponent> {
                 ),
               ),
             ),
-            IconButton(
-              onPressed: _canScrollRight ? _scrollRight : null,
-              icon: Icon(
-                Icons.arrow_forward_ios,
-                color: _canScrollRight ? Colors.grey[400] : Colors.grey[800],
-                size: 18,
-              ),
-            ),
+            
             IconButton(
               onPressed: widget.onAddNewTab,
               icon: Icon(Icons.add, color: Colors.white),
