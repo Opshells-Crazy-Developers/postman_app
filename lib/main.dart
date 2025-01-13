@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:postman_app/services/AuthWrapper.dart';
 import 'package:postman_app/widgets/app_state.dart';
 import 'package:postman_app/Screens/ApisPage.dart';
 import 'package:postman_app/Screens/HelpPage.dart';
@@ -32,7 +33,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => MainScreen(),
+        '/': (context) => AuthWrapper(),
+        '/main': (context) => MainScreen(),
         '/web': (context) => WebPage(),
         '/workflow': (context) => CanvasScreen(),
         '/workspace': (context) => WorkspacePage(),

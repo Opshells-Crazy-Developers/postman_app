@@ -15,7 +15,7 @@ class Overview extends StatelessWidget {
           children: [
             // Welcome Section
             Text(
-              'Welcome to Postman Clone',
+              'Welcome to Postman ',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -46,29 +46,20 @@ class Overview extends StatelessWidget {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            _buildQuickActionButton(
-                              context,
-                              'New Request',
-                              Icons.add,
-                              () {
-                                // Handle new request action
-                              },
-                            ),
                             _buildQuickActionButton(
                               context,
                               'Import',
                               Icons.file_upload,
-                              () {
-                                // Handle import action
-                              },
+                              () {},
                             ),
                             _buildQuickActionButton(
                               context,
                               'New Collection',
                               Icons.create_new_folder,
                               () {
-                                // Handle new collection action
+                                Navigator.pushNamed(context, '/collections');
                               },
                             ),
                           ],
@@ -83,7 +74,7 @@ class Overview extends StatelessWidget {
 
             // Recent Requests Section
             Text(
-              'Recent Requests',
+              'Similar Requests',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -145,22 +136,25 @@ class Overview extends StatelessWidget {
     IconData icon,
     VoidCallback onPressed,
   ) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
-      onPressed: onPressed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white),
-          SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(color: Colors.white),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+        onPressed: onPressed,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: Colors.white),
+            SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }

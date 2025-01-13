@@ -65,16 +65,18 @@ class SendrequestWidgetcontainer extends StatelessWidget {
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              dropdownColor: Colors.black,
-                              hint: Text(
-                                "Select a request",
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                              items: [],
-                              onChanged: null,
+                          child: TextField(
+                            style: TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              hintText: "Enter your request",
+                              hintStyle: TextStyle(color: Colors.white70),
+                              border: InputBorder.none,
+                              contentPadding:
+                                  EdgeInsets.symmetric(vertical: 12),
                             ),
+                            onChanged: (value) {
+                              // Handle text changes here
+                            },
                           ),
                         ),
                         const SizedBox(height: 16),

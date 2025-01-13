@@ -3,6 +3,7 @@ import 'package:postman_app/components/failureContainer.dart';
 import 'package:postman_app/components/sendRequest_widgetContainer.dart';
 import 'package:postman_app/components/start_widgetcontainer.dart';
 import 'package:postman_app/components/successContainer.dart';
+import 'dart:math' as math;
 
 class CanvasScreen extends StatefulWidget {
   const CanvasScreen({super.key});
@@ -55,18 +56,34 @@ class _CanvasScreenState extends State<CanvasScreen> {
   }
 
   void _addNewSendRequestContainer() {
-    setState(() {
-      containerCount++;
-      final center = _transformationController.toScene(Offset(
-          MediaQuery.of(context).size.width / 2,
-          MediaQuery.of(context).size.height / 2));
-      dynamicWidgets.add({
-        'id': containerCount,
-        'type': 'sendRequest',
-        'position': center,
-      });
+  setState(() {
+    containerCount++;
+    final center = _transformationController.toScene(Offset(
+      MediaQuery.of(context).size.width / 2,
+      MediaQuery.of(context).size.height / 2,
+    ));
+    dynamicWidgets.add({
+      'id': containerCount,
+      'type': 'sendRequest',
+      'position': center,
     });
-  }
+
+    // Add connection if another widget is selected
+    if (selectedWidgets.isNotEmpty) {
+      final lastSelectedId = selectedWidgets.keys.first;
+      final lastWidget = dynamicWidgets.firstWhere((w) => w['id'] == lastSelectedId);
+
+      connections.add(Connection(
+        startId: lastSelectedId,
+        endId: containerCount,
+        startPoint: lastWidget['position'],
+        endPoint: center,
+      ));
+      selectedWidgets.clear();
+    }
+  });
+}
+
 
   void _addNewSuccessContainer() {
     setState(() {
@@ -191,111 +208,78 @@ class _CanvasScreenState extends State<CanvasScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.cyan[50],
-      appBar: AppBar(
-        elevation: 1,
-        title: const Text(
-          'Workflow',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.file_download_outlined,
-                  color: Colors.white, size: 20),
-              label: const Text('Export',
-                  style: TextStyle(color: Colors.white, fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[700],
-                elevation: 0,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.cyan[50],
+    appBar: AppBar(
+      title: const Text('Workflow'),
+    ),
+    body: GestureDetector(
+      child: InteractiveViewer(
+        transformationController: _transformationController,
+        boundaryMargin: const EdgeInsets.all(double.infinity),
+        constrained: false,
+        minScale: 0.1,
+        maxScale: 10.0,
+        child: SizedBox(
+          width: 50000,
+          height: 50000,
+          child: Stack(
+            children: [
+              // CustomPaint for connections
+              CustomPaint(
+                size: Size.infinite,
+                painter: ConnectionPainter(connections: connections),
               ),
-            ),
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onScaleStart: (details) {
-          _offset = _transformationController.toScene(details.focalPoint);
-        },
-        onScaleUpdate: (details) {
-          setState(() {
-            _scale *= details.scale;
-            _transformationController.value = Matrix4.identity()
-              ..translate(details.focalPoint.dx - _offset.dx,
-                  details.focalPoint.dy - _offset.dy)
-              ..scale(_scale);
-          });
-        },
-        child: InteractiveViewer(
-          transformationController: _transformationController,
-          boundaryMargin: const EdgeInsets.all(double.infinity),
-          constrained: false,
-          minScale: 0.1,
-          maxScale: 10.0,
-          child: SizedBox(
-            width: 50000,
-            height: 50000,
-            child: Center(
-              child: Stack(
-                children: [
-                  ...dynamicWidgets.map((widget) {
-                    return DraggableWidget(
-                      key: ValueKey(widget['id']),
-                      id: widget['id'],
-                      initialX: widget['position'].dx,
-                      initialY: widget['position'].dy,
-                      type: widget['type'],
-                      isSelected: selectedWidgets.containsKey(widget['id']),
-                      onSelect: _handleWidgetSelection,
-                      onDrag: (Offset position) {
-                        setState(() {
-                          widget['position'] = position;
-                          // Update connections
-                          connections = connections.map((conn) {
-                            if (conn.startId == widget['id']) {
-                              return Connection(
-                                startId: conn.startId,
-                                endId: conn.endId,
-                                startPoint: position,
-                                endPoint: conn.endPoint,
-                              );
-                            } else if (conn.endId == widget['id']) {
-                              return Connection(
-                                startId: conn.startId,
-                                endId: conn.endId,
-                                startPoint: conn.startPoint,
-                                endPoint: position,
-                              );
-                            }
-                            return conn;
-                          }).toList();
-                        });
-                      },
-                      onDelete: () => _deleteWidget(widget['id']),
-                    );
-                  }).toList(),
-                ],
-              ),
-            ),
+              // Dynamic widgets
+              ...dynamicWidgets.map((widget) {
+                return DraggableWidget(
+                  key: ValueKey(widget['id']),
+                  id: widget['id'],
+                  initialX: widget['position'].dx,
+                  initialY: widget['position'].dy,
+                  type: widget['type'],
+                  isSelected: selectedWidgets.containsKey(widget['id']),
+                  onSelect: _handleWidgetSelection,
+                  onDrag: (Offset position) {
+                    setState(() {
+                      widget['position'] = position;
+                      // Update connections
+                      connections = connections.map((conn) {
+                        if (conn.startId == widget['id']) {
+                          return Connection(
+                            startId: conn.startId,
+                            endId: conn.endId,
+                            startPoint: position,
+                            endPoint: conn.endPoint,
+                          );
+                        } else if (conn.endId == widget['id']) {
+                          return Connection(
+                            startId: conn.startId,
+                            endId: conn.endId,
+                            startPoint: conn.startPoint,
+                            endPoint: position,
+                          );
+                        }
+                        return conn;
+                      }).toList();
+                    });
+                  },
+                  onDelete: () => _deleteWidget(widget['id']),
+                );
+              }).toList(),
+            ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue[700],
-        elevation: 4,
-        onPressed: _showAddOptions,
-        child: const Icon(Icons.add, color: Colors.white, size: 24),
-      ),
-    );
-  }
+    ),
+    floatingActionButton: FloatingActionButton(
+      onPressed: _showAddOptions,
+      child: const Icon(Icons.add),
+    ),
+  );
+}
+
 }
 
 class DraggableWidget extends StatefulWidget {
@@ -412,3 +396,52 @@ class Connection {
     required this.endPoint,
   });
 }
+
+class ConnectionPainter extends CustomPainter {
+  final List<Connection> connections;
+
+  ConnectionPainter({required this.connections});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    for (var connection in connections) {
+      // Draw the line
+      canvas.drawLine(connection.startPoint, connection.endPoint, paint);
+
+      // Draw an arrowhead
+      final arrowPaint = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.fill;
+
+      const double arrowSize = 10.0;
+      final angle = (connection.endPoint - connection.startPoint).direction;
+
+      final arrowPoint1 = connection.endPoint.translate(
+        -arrowSize * math.cos(angle - math.pi / 6),
+        -arrowSize * math.sin(angle - math.pi / 6),
+      );
+      final arrowPoint2 = connection.endPoint.translate(
+        -arrowSize * math.cos(angle + math.pi / 6),
+        -arrowSize * math.sin(angle + math.pi / 6),
+      );
+
+      canvas.drawPath(
+        Path()
+          ..moveTo(connection.endPoint.dx, connection.endPoint.dy)
+          ..lineTo(arrowPoint1.dx, arrowPoint1.dy)
+          ..lineTo(arrowPoint2.dx, arrowPoint2.dy)
+          ..close(),
+        arrowPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+

@@ -2,8 +2,10 @@
 
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:postman_app/components/MainScreen_components/authPage.dart';
 import 'package:postman_app/components/MainScreen_components/body.dart';
 import 'package:postman_app/components/MainScreen_components/header.dart';
 import 'package:postman_app/components/MainScreen_components/params.dart';
@@ -16,6 +18,8 @@ class NewFile extends StatefulWidget {
 }
 
 class _NewFileState extends State<NewFile> {
+  AuthPage authPage = AuthPage();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String selectedMethod = 'GET';
   final TextEditingController urlController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
@@ -131,26 +135,7 @@ class _NewFileState extends State<NewFile> {
   }
 
   // Add this method to validate authorization inputs
-  String? validateAuthInputs() {
-    switch (selectedAuthType) {
-      case 'Basic Auth':
-        if (usernameController.text.isEmpty ||
-            passwordController.text.isEmpty) {
-          return 'Username and password are required for Basic Auth';
-        }
-        break;
-      case 'Bearer Token':
-      case 'JWT Bearer':
-        if (tokenController.text.isEmpty) {
-          return 'Token is required';
-        }
-        break;
-      case 'OAuth 2.0':
-        // Add OAuth validation logic here
-        break;
-    }
-    return null;
-  }
+  
 
   Color getMethodColor(String method) {
     switch (method) {
@@ -167,125 +152,7 @@ class _NewFileState extends State<NewFile> {
     }
   }
 
-  Widget _buildAuthenticationForm() {
-    switch (selectedAuthType) {
-      case 'Basic Auth':
-        return Column(
-          children: [
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                labelStyle: TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.grey[800],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(Icons.person, color: Colors.white70),
-              ),
-              style: TextStyle(color: Colors.white),
-            ),
-            SizedBox(height: 12),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                labelStyle: TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.grey[800],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(Icons.lock, color: Colors.white70),
-              ),
-              obscureText: true,
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        );
-
-      case 'Bearer Token':
-      case 'JWT Bearer':
-        return TextField(
-          controller: tokenController,
-          decoration: InputDecoration(
-            labelText: 'Token',
-            labelStyle: TextStyle(color: Colors.white70),
-            filled: true,
-            fillColor: Colors.grey[800],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide.none,
-            ),
-            prefixIcon: Icon(Icons.vpn_key, color: Colors.white70),
-          ),
-          style: TextStyle(color: Colors.white),
-        );
-
-      case 'OAuth 2.0':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Access Token URL',
-                labelStyle: TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.grey[800],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(Icons.link, color: Colors.white70),
-              ),
-              style: TextStyle(color: Colors.white),
-            ),
-            SizedBox(height: 12),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Client ID',
-                labelStyle: TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.grey[800],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(Icons.account_box, color: Colors.white70),
-              ),
-              style: TextStyle(color: Colors.white),
-            ),
-            SizedBox(height: 12),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Client Secret',
-                labelStyle: TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.grey[800],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(Icons.security, color: Colors.white70),
-              ),
-              obscureText: true,
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        );
-
-      default: // No Auth
-        return Center(
-          child: Text(
-            'No authentication required',
-            style: TextStyle(color: Colors.white70),
-          ),
-        );
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -377,12 +244,12 @@ class _NewFileState extends State<NewFile> {
                           tabs: [
                             Tab(text: "Params"),
                             Tab(text: "Headers"),
-                            Tab(text: "Authorization"),
+                            Tab(text: "Auth"),
                             Tab(text: "Body"),
                           ],
                         ),
                         SizedBox(
-                          height: screenSize.height * 0.3,
+                          height: screenSize.height * 0.5,
                           child: TabBarView(
                             children: [
                               // Params Section
@@ -390,54 +257,7 @@ class _NewFileState extends State<NewFile> {
                               // Headers Section
                               header(),
                               //Authorization
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Auth Type Dropdown
-                                    Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[800],
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton<String>(
-                                          value: selectedAuthType,
-                                          isExpanded: true,
-                                          dropdownColor: Colors.grey[800],
-                                          style: TextStyle(color: Colors.white),
-                                          items: [
-                                            'No Auth',
-                                            'Basic Auth',
-                                            'Bearer Token',
-                                            'JWT Bearer',
-                                            'OAuth 2.0',
-                                          ].map((String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
-                                          onChanged: (String? newValue) {
-                                            if (newValue != null) {
-                                              setState(() {
-                                                selectedAuthType = newValue;
-                                              });
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 16),
-                                    // Auth Form
-                                    _buildAuthenticationForm(),
-                                  ],
-                                ),
-                              ),
+                              AuthPage(),
                               // bodycontainer
                               bodyContainer(),
                             ],
@@ -530,16 +350,35 @@ class _NewFileState extends State<NewFile> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final validationError = validateAuthInputs();
-          if (validationError != null && selectedAuthType != 'No Auth') {
+        onPressed: () async {
+          // final validationError = authPage.validateAuthInputs();
+          // if (validationError != null && selectedAuthType != 'No Auth') {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(
+          //       content: Text(validationError),
+          //       backgroundColor: Colors.red,
+          //     ),
+          //   );
+          //   return;
+          // }
+          try {
+            await _firestore.collection('history').add({
+              'url': urlController.text,
+              'method': selectedMethod,
+              'timestamp': FieldValue.serverTimestamp(),
+              'authType': selectedAuthType,
+              // 'headers': headers, // Assuming you have headers stored in a map
+              'body': bodyController.text,
+              'createdAt': DateTime.now().millisecondsSinceEpoch,
+              // 'params': params, // Assuming you have params stored in a map
+            });
+          } catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(validationError),
+                content: Text('Failed to save to history: $e'),
                 backgroundColor: Colors.red,
               ),
             );
-            return;
           }
           sendRequest();
         },

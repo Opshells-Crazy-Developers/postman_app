@@ -1,3 +1,6 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -5,6 +8,7 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
     return Drawer(
       child: Container(
         color: Colors.grey[900],
@@ -13,50 +17,56 @@ class MainDrawer extends StatelessWidget {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                // ignore: deprecated_member_use
                 color: Colors.orange.withOpacity(0.2),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Icon(Icons.api, size: 40, color: Colors.orange),
-                  SizedBox(height: 8),
+                  if (user?.photoURL != null)
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: NetworkImage(user!.photoURL!),
+                      backgroundColor: Colors.orange.withOpacity(0.2),
+                    )
+                  else
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.orange.withOpacity(0.2),
+                      child: const Icon(Icons.person,
+                          size: 35, color: Colors.white),
+                    ),
+                  const SizedBox(height: 8),
+                  // Show user's name if available, otherwise show 'Guest'
                   Text(
-                    'Postman Clone',
-                    style: TextStyle(
+                    user?.displayName ?? 'Guest',
+                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 20,
                     ),
                   ),
+                  // Show user's email
+                  if (user?.email != null)
+                    Text(
+                      user!.email!,
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 14,
+                      ),
+                    ),
                 ],
               ),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  Text(
-                    'No environment',
-                    style: TextStyle(color: Colors.grey[400]),
-                  ),
-                  Spacer(),
-                  Icon(Icons.expand_more, color: Colors.grey[400]),
-                ],
-              ),
-            ),
-            Divider(color: Colors.grey[800]),
             DrawerListTile(
               icon: Icons.home,
               title: 'Home',
-              onTap: () => Navigator.pushNamed(context, '/'),
+              onTap: () => Navigator.pushNamed(context, '/main'),
             ),
-            DrawerListTile(
-              icon: Icons.web,
-              title: 'Web',
-              onTap: () => Navigator.pushNamed(context, '/web'),
-            ),
+            // DrawerListTile(
+            //   icon: Icons.web,
+            //   title: 'Web',
+            //   onTap: () => Navigator.pushNamed(context, '/web'),
+            // ),
             DrawerListTile(
               icon: Icons.crop_landscape_outlined,
               title: 'Workspace',
@@ -73,26 +83,16 @@ class MainDrawer extends StatelessWidget {
               onTap: () => Navigator.pushNamed(context, '/workflow'),
             ),
             DrawerListTile(
+              icon: Icons.history_outlined,
+              title: 'History',
+              onTap: () => Navigator.pushNamed(context, '/history'),
+            ),
+            DrawerListTile(
               icon: Icons.api_outlined,
               title: 'APIs (VPN Networks)',
               onTap: () => Navigator.pushNamed(context, '/apis'),
             ),
-            // DrawerListTile(
-            //   icon: Icons.monitor_heart,
-            //   title: 'Monitor',
-            //   onTap: () => Navigator.pushNamed(context, '/monitor'),
-            // ),
-            // DrawerListTile(
-            //   icon: Icons.history,
-            //   title: 'History',
-            //   onTap: () => Navigator.pushNamed(context, '/history'),
-            // ),
             Divider(color: Colors.grey[800]),
-            DrawerListTile(
-              icon: Icons.help_outline,
-              title: 'Help',
-              onTap: () => Navigator.pushNamed(context, '/help'),
-            ),
             DrawerListTile(
               icon: Icons.settings_outlined,
               title: 'Settings',
@@ -123,7 +123,6 @@ class DrawerListTile extends StatelessWidget {
       leading: Icon(icon, color: Colors.white),
       title: Text(title, style: TextStyle(color: Colors.white)),
       onTap: onTap,
-      // ignore: deprecated_member_use
       hoverColor: Colors.orange.withOpacity(0.1),
     );
   }

@@ -23,8 +23,6 @@ class TabBarComponent extends StatefulWidget {
 
 class _TabBarComponentState extends State<TabBarComponent> {
   final ScrollController _scrollController = ScrollController();
-  bool _canScrollLeft = false;
-  bool _canScrollRight = false;
 
   @override
   void initState() {
@@ -37,11 +35,7 @@ class _TabBarComponentState extends State<TabBarComponent> {
 
   void _updateScrollButtons() {
     if (_scrollController.hasClients) {
-      setState(() {
-        _canScrollLeft = _scrollController.position.pixels > 0;
-        _canScrollRight = _scrollController.position.pixels <
-            _scrollController.position.maxScrollExtent;
-      });
+      setState(() {});
     }
   }
 
@@ -126,7 +120,6 @@ class _TabBarComponentState extends State<TabBarComponent> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            
             Expanded(
               child: SingleChildScrollView(
                 controller: _scrollController,
@@ -139,7 +132,6 @@ class _TabBarComponentState extends State<TabBarComponent> {
                 ),
               ),
             ),
-            
             IconButton(
               onPressed: widget.onAddNewTab,
               icon: Icon(Icons.add, color: Colors.white),
